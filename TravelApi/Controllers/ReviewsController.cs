@@ -15,7 +15,7 @@ namespace TravelApi.Controllers
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Review>>> Get(string country, string city, bool sortByRating, bool sortByDescriptionCount)
+    public async Task<ActionResult<IEnumerable<Review>>> Get(string country, string city, bool sortByRating, bool sortByDescriptionCount, bool random)
     {
       IQueryable<Review> query = _db.Reviews.AsQueryable();
 
@@ -50,6 +50,20 @@ namespace TravelApi.Controllers
         query = query.OrderByDescending(review => review.DescriptionCount);
       }
 
+      // Get random entry
+      if (random == true)
+      {
+        int reviewsCount = query.Count();
+        
+        var rand = new Random();
+        int randomId = rand.Next(1, reviewsCount + 1);
+
+        while (!ReviewExists(randomId))
+        {
+          randomId = rand.Next(1, reviewsCount + 1);
+        }
+        query = query.Where(review => review.ReviewId == randomId);
+      }
       return await query.ToListAsync();
     }
 
@@ -62,5 +76,66 @@ namespace TravelApi.Controllers
       return CreatedAtAction(nameof(Get), new { id = review.ReviewId }, review);
     }
 
+    //5001/api/reviews/{id}
+    // 5001/api/reviews/{}?userName=Henry
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Put(int id, Review review, string userName)
+    {
+      
+      if (id != review.ReviewId)
+      {
+        return BadRequest();
+      }
+      if (userName != review.Author)
+      {
+        return BadRequest();
+      }
+      _db.Reviews.Update(review);
+
+      try
+      {
+        await _db.SaveChangesAsync();
+      }
+      catch (DbUpdateConcurrencyException)
+      {
+        if (!ReviewExists(id))
+        {
+          return NotFound();
+        }
+        else
+        {
+          throw;
+        }
+      }
+
+      return NoContent();
+    }
+
+    private bool ReviewExists(int id)
+    {
+      return _db.Reviews.Any(e => e.ReviewId == id);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteReview(int id, string userName)
+    {
+      Review review = await _db.Reviews.FindAsync(id);
+      if (review == null)
+      {
+        return NotFound();
+      }
+      
+      if (userName != review.Author)
+      {
+        return BadRequest();
+      }
+
+      _db.Reviews.Remove(review);
+      await _db.SaveChangesAsync();
+
+      return NoContent();
+    }
+    
+    
   }
 }
