@@ -8,5 +8,6 @@ namespace TravelApi.Models
     public string City {get; set;} 
     public int Rating {get; set;} 
     public string Author {get; set;} 
+    public int DescriptionCount {get; set;} 
   }
 }
