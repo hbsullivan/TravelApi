@@ -66,7 +66,7 @@ else
 }
 
 // app.UseRequestLocalization(options);
-// app.UseStaticFiles();
+app.UseStaticFiles();
 // app.UseMiddleware<LocalizerMiddleware>();
 
 app.UseAuthorization();
