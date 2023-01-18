@@ -1,14 +1,8 @@
 using TravelApi.Models;
-// using TravelApi.Controllers.v1;
-// using TravelApi.Controllers.v2;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
+// using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
-using Swashbuckle.AspNetCore.Swagger;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -71,9 +65,9 @@ else
     app.UseHttpsRedirection();
 }
 
-app.UseRequestLocalization(options);
-app.UseStaticFiles();
-app.UseMiddleware<LocalizerMiddleware>();
+// app.UseRequestLocalization(options);
+// app.UseStaticFiles();
+// app.UseMiddleware<LocalizerMiddleware>();
 
 app.UseAuthorization();
 
