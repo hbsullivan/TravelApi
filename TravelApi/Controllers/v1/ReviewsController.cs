@@ -2,10 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TravelApi.Models;
 
-namespace TravelApi.Controllers
+
+namespace TravelApi.Controllers.v1
 {
-  [Route("api/[controller]")]
   [ApiController]
+  [Route("api/v{version:apiVersion}/[controller]")]
+  [ApiVersion("1.0")]
   public class ReviewsController : ControllerBase
   {
     private readonly TravelApiContext _db;
@@ -15,7 +17,7 @@ namespace TravelApi.Controllers
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Review>>> Get(string country, string city, bool sortByRating, bool sortByDescriptionCount, bool random)
+    public async Task<ActionResult<IEnumerable<Review>>> Get(string country, string city, bool sortByRating, bool sortByDescriptionCount)
     {
       IQueryable<Review> query = _db.Reviews.AsQueryable();
 
@@ -49,21 +51,7 @@ namespace TravelApi.Controllers
         // Order by city & country
         query = query.OrderByDescending(review => review.DescriptionCount);
       }
-
-      // Get random entry
-      if (random == true)
-      {
-        int reviewsCount = query.Count();
-        
-        var rand = new Random();
-        int randomId = rand.Next(1, reviewsCount + 1);
-
-        while (!ReviewExists(randomId))
-        {
-          randomId = rand.Next(1, reviewsCount + 1);
-        }
-        query = query.Where(review => review.ReviewId == randomId);
-      }
+      
       return await query.ToListAsync();
     }
 
